@@ -12,7 +12,7 @@ from ip_packet_identifier.src.tcp_packet import TCPPacket
 from ip_packet_identifier.src.icmp_packet import ICMPPacket
 
 
-filename = "test2.pcap"
+filename = "packets.pcapng"
 
 
 def process_file(file_name: str) -> list:
@@ -72,7 +72,7 @@ def process_file(file_name: str) -> list:
                 # stats['tcp']['acknowledgement_number'] = embedded_protocol.get_tcp_acknowledgement_number()
                 # stats['tcp']['data_offset'] = embedded_protocol.get_tcp_data_offset()
                 # stats['tcp']['reserved'] = embedded_protocol.get_tcp_reserved()
-                stats['tcp']['flags'] = embedded_protocol.get_tcp_flags()
+                stats['tcp']['flags'] = embedded_protocol.get_tcp_flags_in_dict()
                 # stats['tcp']['window'] = embedded_protocol.get_tcp_window()
                 # stats['tcp']['checksum'] = embedded_protocol.get_tcp_checksum()
                 # stats['tcp']['urgent_pointer'] = embedded_protocol.get_tcp_urgent_pointer()
@@ -104,4 +104,10 @@ def process_file(file_name: str) -> list:
 
 if __name__ == '__main__':
     stats = process_file(filename)
-    print(json.dumps(stats, indent=4))
+    print(f"Processed {len(stats)} packets.")
+    # print(json.dumps(stats, indent=4))
+
+    # write to a file
+    print("Writing to stats.json...")
+    with open('stats.json', 'w') as outfile:
+        json.dump(stats, outfile, indent=4)

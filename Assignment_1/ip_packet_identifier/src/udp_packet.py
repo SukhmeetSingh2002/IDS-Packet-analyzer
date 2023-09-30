@@ -1,4 +1,5 @@
-from ip_packet_identifier.src.Layer import Layer 
+from ip_packet_identifier.src.Layer import Layer
+
 
 class UDPPacket(Layer):
     """
@@ -18,11 +19,11 @@ class UDPPacket(Layer):
         Returns the source port number of the UDP packet.
         :return: The source port number.
         """
-        return self.packet[0:2]
+        return int(self.packet[0:2], 16)
 
     def get_udp_destination_port(self):
         """
         Returns the destination port number of the UDP packet.
         :return: The destination port number.
         """
-        return self.packet[2:4]
+        return int(self.packet[2:4], 16)

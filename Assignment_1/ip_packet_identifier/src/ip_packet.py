@@ -45,7 +45,7 @@ class IPPacket(Layer):
         return bool(self.packet[21:22] == '1')
     
     def get_ttl(self):
-        return self.packet[22:24]
+        return int(self.packet[22:24], 16)
     
     # def get_icmp_type(self):
     #     if self.identify_protocol() == 1:
