@@ -19,6 +19,8 @@ class GUIInterface(Interface):
         self.root.title("IP Packet Identifier")
         self.file_name = None
         self.stats = None
+        self.heading_columns = ("Packet #", "IP Version", "Source Address", "Destination Address", "Protocol", "Source Port", "Destination Port", "Flags", "ICMP Type", "ICMP Code", "UDP Source Port", "UDP Destination Port")
+
 
         self.root.geometry("800x600")
         self.root.grid_columnconfigure(0, weight=1)
@@ -28,7 +30,7 @@ class GUIInterface(Interface):
         self.file_label = tk.Label(self.root, text="No file selected.")
         self.file_button = tk.Button(self.root, text="Select file", command=self.select_file)
         self.process_button = tk.Button(self.root, text="Process file", command=self.process_file)
-        self.stats_tree = ttk.Treeview(self.root, columns=("Packet #", "IP Version", "Source Address", "Destination Address", "Protocol", "Source Port", "Destination Port", "Flags", "ICMP Type", "ICMP Code", "UDP Source Port", "UDP Destination Port"))
+        self.stats_tree = ttk.Treeview(self.root, columns=self.heading_columns)
         self.stats_scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=self.stats_tree.yview)
         # self.stats_tree.configure(yscrollcommand=self.stats_scrollbar.set)
         self.stats_hscrollbar = ttk.Scrollbar(self.root, orient="horizontal", command=self.stats_tree.xview)
@@ -101,7 +103,7 @@ class GUIInterface(Interface):
                 packet_stats["ip"]["embedded_protocol"],
                 packet_stats.get("tcp", {}).get("source_port", ""),
                 packet_stats.get("tcp", {}).get("destination_port", ""),
-                packet_stats.get("tcp", {}).get("00010000", "")[2:],
+                packet_stats.get("tcp", {}).get("flags_binary", "")[2:],
                 packet_stats.get("icmp", {}).get("type", ""),
                 packet_stats.get("icmp", {}).get("code", ""),
                 packet_stats.get("udp", {}).get("source_port", ""),
@@ -112,7 +114,24 @@ class GUIInterface(Interface):
         # Resize columns to fit content
         for i in range(len(row)):
             self.stats_tree.column(i, width=100)
-            # self.stats_tree.heading(i, text=row[i])
+            # self.stats_tree.heading(i, text=self.heading_columns[i])
+
+        # Allow sorting by column
+        for i in range(len(row)):
+            self.stats_tree.heading(i, command=lambda col=i: self.sortby(self.stats_tree, col, False))
+
+
+    def sortby(self, tree, col, descending):
+        """Sort tree contents when a column is clicked on."""
+        data = [(tree.set(child, col), child) for child in tree.get_children('')]
+        data.sort(reverse=descending)
+
+        for i, item in enumerate(data):
+            self.stats_tree.move(item[1], '', i)
+
+        # Switch the heading so that it will sort in the opposite direction
+        self.stats_tree.heading(col, command=lambda col=col: self.sortby(tree, col, not descending))
+
 
     def run(self, *args):
         print("Running GUI interface...", args)
