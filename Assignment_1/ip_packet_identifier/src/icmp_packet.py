@@ -1,4 +1,3 @@
-# from ip_packet import IPPacket
 from ip_packet_identifier.src.Layer import Layer
 
 class ICMPPacket(Layer):

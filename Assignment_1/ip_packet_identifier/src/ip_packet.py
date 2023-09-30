@@ -1,4 +1,4 @@
-from src import Layer
+from ip_packet_identifier.src.Layer import Layer
 
 class IPPacket(Layer):
     def __init__(self, packet):
@@ -6,7 +6,7 @@ class IPPacket(Layer):
         super().__init__(packet)
     
     def identify_protocol(self):
-        return self.packet[18:20]
+        return int(self.packet[18:20], 16)
     
     def get_version(self):
         return self.packet[:1]
