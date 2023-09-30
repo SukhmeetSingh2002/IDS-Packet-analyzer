@@ -46,7 +46,7 @@ class CLIInterface(Interface):
     def process_file(self, file_name: str) -> List[dict]:
 
         if file_name is None:
-            self.ask_for_file()
+            file_name = self.ask_for_file()
 
         print('Opening {}...'.format(file_name))
         all_packets = []
@@ -122,6 +122,11 @@ class CLIInterface(Interface):
         else:
             self.console.print("Not displaying anything.")
 
+    def run(self, file_name: str = None):
+        stats = self.process_file(file_name)
+        self.display_stats(stats)
+        return stats
+
 
 
 
@@ -147,8 +152,7 @@ def main():
         interface.use_rich = False
         
 
-    stats = interface.process_file(args.file_name)
-    interface.display_stats(stats)
+    stats = interface.run(args.file_name)
 
     # write to a file
     print(f"Writing to {OUTPUT_FILE_NAME}...")

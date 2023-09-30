@@ -23,3 +23,9 @@ class Interface(ABC):
             stats: List of dictionaries, where each dictionary contains the statistics
         """
         pass
+
+    @abstractmethod
+    def run(self):
+        """Run the interface."""
+        pass
+    
