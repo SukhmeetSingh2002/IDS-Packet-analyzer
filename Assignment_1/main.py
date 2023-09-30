@@ -1,9 +1,11 @@
 import argparse
 import json
-from abc import ABC, abstractmethod
 from typing import List
 
 from scapy.utils import RawPcapReader
+
+from GUI_interface import GUIInterface
+from Interface import Interface
 
 from ip_packet_identifier.src.pcap_processor import process_file
 
@@ -21,27 +23,7 @@ except ImportError:
     print("=================================", end="\n\n")
 
 
-class Interface(ABC):
-    """Abstract base class for CLI and GUI interfaces."""
 
-    @abstractmethod
-    def process_file(self, file_name: str) -> List[dict]:
-        """Process a pcap file, extracting statistics.
-        Arguments:
-            file_name: The name of the pcap file to process.
-
-        Returns:
-            List of dictionaries, where each dictionary contains the statistics
-        """
-        pass
-
-    @abstractmethod
-    def display_stats(self, stats: List[dict]):
-        """Display the statistics.
-        Arguments:
-            stats: List of dictionaries, where each dictionary contains the statistics
-        """
-        pass
 
 
 class CLIInterface(Interface):
@@ -53,7 +35,19 @@ class CLIInterface(Interface):
             return
         self.console = Console()
 
+
+    def ask_for_file(self) -> str:
+        if not self.use_rich:
+            return input("Enter the name of the pcap file to process: ")
+        
+        return Prompt.ask("Enter the name of the pcap file to process.")
+    
+
     def process_file(self, file_name: str) -> List[dict]:
+
+        if file_name is None:
+            self.ask_for_file()
+
         print('Opening {}...'.format(file_name))
         all_packets = []
         
@@ -131,34 +125,17 @@ class CLIInterface(Interface):
 
 
 
-class GUIInterface(Interface):
-    """Graphical user interface implementation using tkinter."""
-
-    def process_file(self, file_name: str) -> List[dict]:
-        print('Opening {}...'.format(file_name))
-        all_packets = []
-
-        for (pkt_data, pkt_metadata,) in RawPcapReader(file_name):
-            stats = process_file(pkt_data, pkt_metadata)
-            all_packets.append(stats)
-
-        return all_packets
-
-    def display_stats(self, stats: List[dict]):
-        # TODO: Implement GUI display of statistics
-        pass
-
 
 def main():
     parser = argparse.ArgumentParser(description='Process a pcap file, extracting statistics.')
-    parser.add_argument('file_name', type=str, help='The name of the pcap file to process.')
+    parser.add_argument('-f','--file_name', type=str, help='The name of the pcap file to process.')
     parser.add_argument('--gui', action='store_true', help='Use graphical user interface.')
     parser.add_argument('--cli', action='store_true', help='Use command-line interface.')
     parser.add_argument('--no-prettify', action='store_true', help='Do not prettify output.')
-    parser.add_argument('--output', type=str, help='Output file name.')
+    parser.add_argument('-o','--output', type=str, help='Output file name.')
     args = parser.parse_args()
 
-    output_file_name = args.output if args.output else 'stats.json'
+    OUTPUT_FILE_NAME = args.output if args.output else 'stats.json'
 
     if args.gui:
         interface = GUIInterface()
@@ -174,8 +151,8 @@ def main():
     interface.display_stats(stats)
 
     # write to a file
-    print(f"Writing to {output_file_name}...")
-    with open(output_file_name, 'w') as outfile:
+    print(f"Writing to {OUTPUT_FILE_NAME}...")
+    with open(OUTPUT_FILE_NAME, 'w') as outfile:
         json.dump(stats, outfile, indent=4)
 
 
