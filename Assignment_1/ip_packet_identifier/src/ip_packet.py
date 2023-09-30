@@ -38,47 +38,18 @@ class IPPacket(Layer):
         ip = self.packet[32:40]
         return '.'.join(str(int(i, 16)) for i in [ip[:2], ip[2:4], ip[4:6], ip[6:8]])
     
+    def get_flags(self):
+        byte_containing_flags = self.packet[12:13]
+        four_bits = bin(int(byte_containing_flags, 16))[2:].zfill(4)
+        return four_bits[:3]
+
     def is_df_set(self):
-        return bool(self.packet[20:21] == '1')
-    
+        return bool(self.get_flags()[1] == '1')
+
     def is_mf_set(self):
-        return bool(self.packet[21:22] == '1')
+        return bool(self.get_flags()[2] == '1')
+
     
     def get_ttl(self):
-        return int(self.packet[22:24], 16)
+        return int(self.packet[16:18], 16)
     
-    # def get_icmp_type(self):
-    #     if self.identify_protocol() == 1:
-    #         return self.packet[self.get_header_size():self.get_header_size()+2]
-    
-    # def get_tcp_source_port(self):
-    #     if self.identify_protocol() == 6:
-    #         return int.from_bytes(self.packet[self.get_header_size():self.get_header_size()+2], byteorder='big')
-    
-    # def get_tcp_destination_port(self):
-    #     if self.identify_protocol() == 6:
-    #         return int.from_bytes(self.packet[self.get_header_size()+2:self.get_header_size()+4], byteorder='big')
-    
-    # def get_tcp_header_length(self):
-    #     if self.identify_protocol() == 6:
-    #         return (self.packet[self.get_header_size()+12] >> 4) * 4
-    
-    # def get_tcp_flags(self):
-    #     if self.identify_protocol() == 6:
-    #         flags = {}
-    #         tcp_header = self.packet[self.get_header_size():self.get_header_size()+self.get_tcp_header_length()]
-    #         flags['URG'] = bool(tcp_header[13] & 32)
-    #         flags['ACK'] = bool(tcp_header[13] & 16)
-    #         flags['PSH'] = bool(tcp_header[13] & 8)
-    #         flags['RST'] = bool(tcp_header[13] & 4)
-    #         flags['SYN'] = bool(tcp_header[13] & 2)
-    #         flags['FIN'] = bool(tcp_header[13] & 1)
-    #         return flags
-    
-    # def get_udp_source_port(self):
-    #     if self.identify_protocol() == 17:
-    #         return int.from_bytes(self.packet[self.get_header_size():self.get_header_size()+2], byteorder='big')
-    
-    # def get_udp_destination_port(self):
-    #     if self.identify_protocol() == 17:
-    #         return int.from_bytes(self.packet[self.get_header_size()+2:self.get_header_size()+4], byteorder='big')

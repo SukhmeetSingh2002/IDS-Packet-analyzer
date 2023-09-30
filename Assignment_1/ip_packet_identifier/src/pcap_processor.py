@@ -51,7 +51,7 @@ def process_file(pkt_data, pkt_metadata = None) -> List[dict]:
             stats['tcp']['source_port'] = embedded_protocol.get_tcp_source_port()
             stats['tcp']['destination_port'] = embedded_protocol.get_tcp_destination_port()
             stats['tcp']['flags'] = embedded_protocol.get_tcp_flags_in_dict()
-            stats['tcp']['flags_binary'] = embedded_protocol.get_tcp_flags_in_binary()
+            stats['tcp']['flags_binary'] = embedded_protocol.get_tcp_flags_in_binary()[2:]
         elif isinstance(embedded_protocol, UDPPacket):
             stats.setdefault('udp', {})
             stats['udp']['source_port'] = embedded_protocol.get_udp_source_port()

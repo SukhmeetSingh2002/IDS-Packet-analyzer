@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.pyz
+*.pyzw
+
+# Test files
+*.pcapng
+*.pcap
+BOOKS/
+*.zip
+
+# Statistics
+*.json
+
+# IDEs
+.vscode/
+.idea/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
