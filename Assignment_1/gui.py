@@ -50,7 +50,7 @@ app.mainloop()
 # gui code
 
 import tkinter as tk
-from ip_packet import IPPacket
+from ip_packet_identifier.src.ip_packet import IPPacket
 
 class IPInfoUI:
     def __init__(self, master):
